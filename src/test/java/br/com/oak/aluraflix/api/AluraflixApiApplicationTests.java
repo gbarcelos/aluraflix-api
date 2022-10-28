@@ -9,5 +9,4 @@ class AluraflixApiApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }
