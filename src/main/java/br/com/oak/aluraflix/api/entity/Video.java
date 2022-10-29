@@ -15,8 +15,8 @@ import javax.persistence.Id;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Video {
 
-    @EqualsAndHashCode.Include
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
