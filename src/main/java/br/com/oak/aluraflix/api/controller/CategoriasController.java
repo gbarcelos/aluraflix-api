@@ -3,8 +3,10 @@ package br.com.oak.aluraflix.api.controller;
 import br.com.oak.aluraflix.api.controller.openapi.CategoriasControllerOpenApi;
 import br.com.oak.aluraflix.api.model.contract.response.ContractResponse;
 import br.com.oak.aluraflix.api.model.dto.CategoriaDto;
+import br.com.oak.aluraflix.api.model.dto.VideoDto;
 import br.com.oak.aluraflix.api.model.input.CategoriaInput;
 import br.com.oak.aluraflix.api.service.CategoriaService;
+import br.com.oak.aluraflix.api.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ import java.util.List;
 public class CategoriasController implements CategoriasControllerOpenApi {
 
   private final CategoriaService categoriaService;
+  private final VideoService videoService;
 
   @Override
   @GetMapping
@@ -30,6 +33,17 @@ public class CategoriasController implements CategoriasControllerOpenApi {
     return ContractResponse.<List<CategoriaDto>>builder()
         .path(request.getServletPath())
         .response(categoriaService.listarCategorias(titulo))
+        .build();
+  }
+
+  @Override
+  @GetMapping(value = "/{id}/videos")
+  @ResponseStatus(HttpStatus.OK)
+  public ContractResponse<List<VideoDto>> listarVideosPorCategoria(
+      @PathVariable(value = "id") Long id, HttpServletRequest request) {
+    return ContractResponse.<List<VideoDto>>builder()
+        .path(request.getServletPath())
+        .response(videoService.listarVideosPorCategoria(id))
         .build();
   }
 

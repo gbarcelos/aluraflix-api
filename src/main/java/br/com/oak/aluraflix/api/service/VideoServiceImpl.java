@@ -33,6 +33,11 @@ public class VideoServiceImpl implements VideoService {
   }
 
   @Override
+  public List<VideoDto> listarVideosPorCategoria(Long categoriaId) {
+    return videoMapper.unmap(videoRepository.findByCategoriaId(categoriaId));
+  }
+
+  @Override
   public VideoDto detalhar(Long id) {
 
     Video video = buscarVideoPorId(id);

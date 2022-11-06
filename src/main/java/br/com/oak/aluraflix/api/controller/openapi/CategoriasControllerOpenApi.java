@@ -2,6 +2,7 @@ package br.com.oak.aluraflix.api.controller.openapi;
 
 import br.com.oak.aluraflix.api.model.contract.response.ContractResponse;
 import br.com.oak.aluraflix.api.model.dto.CategoriaDto;
+import br.com.oak.aluraflix.api.model.dto.VideoDto;
 import br.com.oak.aluraflix.api.model.input.CategoriaInput;
 import io.swagger.annotations.*;
 
@@ -18,6 +19,12 @@ public interface CategoriasControllerOpenApi {
   ContractResponse<List<CategoriaDto>> listarCategorias(
       @ApiParam(name = "titulo", type = "String", value = "Titulo de uma categoria") String titulo,
       HttpServletRequest request);
+
+  @ApiOperation(
+      value = "Lista os vídeos por categoria cadastrados no sistema",
+      tags = {"Consultas"})
+  @ApiResponses({@ApiResponse(code = 200, message = "Vídeos por categoria listados com sucesso")})
+  ContractResponse<List<VideoDto>> listarVideosPorCategoria(Long id, HttpServletRequest request);
 
   @ApiOperation(
       value = "Detalha uma categoria cadastrada no sistema",

@@ -15,4 +15,7 @@ public interface VideoRepository extends CrudRepository<Video, Long> {
 
   @Query("from Video v join fetch v.categoria where v.titulo like %:titulo%")
   List<Video> findByTitulo(String titulo);
+
+  @Query("from Video v join fetch v.categoria where v.categoria.id = :categoriaId")
+  List<Video> findByCategoriaId(Long categoriaId);
 }

@@ -8,6 +8,8 @@ import java.util.List;
 public interface VideoService {
   List<VideoDto> listarVideos(String titulo);
 
+  List<VideoDto> listarVideosPorCategoria(Long categoriaId);
+
   VideoDto detalhar(Long id);
 
   VideoDto inserir(VideoInput videoInput);

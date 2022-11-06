@@ -24,6 +24,6 @@ public class Video {
   private String url;
 
   @ManyToOne
-  @JoinColumn(name = "categoria_id")
+  @JoinColumn(name = "categoria_id", nullable = false)
   private Categoria categoria;
 }
