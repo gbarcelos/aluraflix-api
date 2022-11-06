@@ -26,10 +26,10 @@ public class VideosController implements VideosControllerOpenApi {
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
   public ContractResponse<List<VideoDto>> listarVideos(
-      @RequestParam(required = false) String descricao, HttpServletRequest request) {
+      @RequestParam(required = false) String titulo, HttpServletRequest request) {
     return ContractResponse.<List<VideoDto>>builder()
         .path(request.getServletPath())
-        .response(videoService.listarVideosDoUsuario(descricao))
+        .response(videoService.listarVideos(titulo))
         .build();
   }
 

@@ -8,6 +8,7 @@ import br.com.oak.aluraflix.api.model.input.VideoInput;
 import br.com.oak.aluraflix.api.repository.VideoRepository;
 import br.com.oak.aluraflix.api.service.mapper.VideoMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,11 @@ public class VideoServiceImpl implements VideoService {
   private final ModelMapper modelMapper;
 
   @Override
-  public List<VideoDto> listarVideosDoUsuario(String descricao) {
+  public List<VideoDto> listarVideos(String titulo) {
+
+    if (StringUtils.isNotBlank(titulo)) {
+      return videoMapper.unmap(videoRepository.findByTitulo(titulo));
+    }
     return videoMapper.unmap(videoRepository.findAll());
   }
 

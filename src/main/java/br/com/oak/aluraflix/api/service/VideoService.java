@@ -6,7 +6,7 @@ import br.com.oak.aluraflix.api.model.input.VideoInput;
 import java.util.List;
 
 public interface VideoService {
-  List<VideoDto> listarVideosDoUsuario(String descricao);
+  List<VideoDto> listarVideos(String titulo);
 
   VideoDto detalhar(Long id);
 
