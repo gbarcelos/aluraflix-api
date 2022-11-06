@@ -2,9 +2,11 @@ package br.com.oak.aluraflix.api.service.mapper;
 
 import br.com.oak.aluraflix.api.entity.Video;
 import br.com.oak.aluraflix.api.model.input.VideoInput;
+import br.com.oak.aluraflix.api.repository.CategoriaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
@@ -14,10 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class VideoMapperTest {
 
   private VideoMapper videoMapper;
+  @Mock private CategoriaRepository categoriaRepository;
 
   @BeforeEach
   public void beforeEach() {
-    videoMapper = new VideoMapper(new ModelMapper());
+    videoMapper = new VideoMapper(new ModelMapper(), categoriaRepository);
   }
 
   @Test

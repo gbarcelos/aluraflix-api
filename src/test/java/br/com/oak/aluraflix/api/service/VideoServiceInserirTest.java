@@ -2,6 +2,7 @@ package br.com.oak.aluraflix.api.service;
 
 import br.com.oak.aluraflix.api.entity.Video;
 import br.com.oak.aluraflix.api.model.input.VideoInput;
+import br.com.oak.aluraflix.api.repository.CategoriaRepository;
 import br.com.oak.aluraflix.api.repository.VideoRepository;
 import br.com.oak.aluraflix.api.service.mapper.VideoMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.verify;
 public class VideoServiceInserirTest {
 
   @Mock private VideoRepository videoRepository;
+  @Mock private CategoriaRepository categoriaRepository;
 
   private VideoMapper videoMapper;
 
@@ -29,7 +31,7 @@ public class VideoServiceInserirTest {
   @BeforeEach
   public void beforeEach() {
     modelMapper = new ModelMapper();
-    videoMapper = new VideoMapper(modelMapper);
+    videoMapper = new VideoMapper(modelMapper, categoriaRepository);
     videoService = new VideoServiceImpl(videoRepository, videoMapper, modelMapper);
   }
 

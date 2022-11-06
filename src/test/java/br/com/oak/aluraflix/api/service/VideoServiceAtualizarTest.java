@@ -4,6 +4,7 @@ import br.com.oak.aluraflix.api.entity.Video;
 import br.com.oak.aluraflix.api.exception.NotFoundException;
 import br.com.oak.aluraflix.api.model.ErrorCode;
 import br.com.oak.aluraflix.api.model.input.VideoInput;
+import br.com.oak.aluraflix.api.repository.CategoriaRepository;
 import br.com.oak.aluraflix.api.repository.VideoRepository;
 import br.com.oak.aluraflix.api.service.mapper.VideoMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,7 @@ public class VideoServiceAtualizarTest {
   public static final Long VIDEO_ID = 1L;
 
   @Mock private VideoRepository videoRepository;
+  @Mock private CategoriaRepository categoriaRepository;
 
   @Captor private ArgumentCaptor<Video> captor;
 
@@ -44,7 +46,7 @@ public class VideoServiceAtualizarTest {
             mapper -> {
               mapper.skip(Video::setId);
             });
-    videoMapper = new VideoMapper(modelMapper);
+    videoMapper = new VideoMapper(modelMapper, categoriaRepository);
     videoService = new VideoServiceImpl(videoRepository, videoMapper, modelMapper);
   }
 
