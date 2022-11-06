@@ -13,7 +13,7 @@ import javax.persistence.Id;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Video {
+public class Categoria {
 
   @Id
   @EqualsAndHashCode.Include
@@ -22,7 +22,5 @@ public class Video {
 
   private String titulo;
 
-  private String descricao;
-
-  private String url;
+  private String cor;
 }

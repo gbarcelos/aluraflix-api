@@ -12,18 +12,19 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ErrorResponse {
-    @ApiModelProperty(example = "400", position = 1)
-    private Integer status;
 
-    @ApiModelProperty(example = "BAD_REQUEST", position = 2)
-    private String type;
+  @ApiModelProperty(example = "400", position = 1)
+  private Integer status;
 
-    @ApiModelProperty(example = "INVALID_PARAMETER", position = 3)
-    private String errorCode;
+  @ApiModelProperty(example = "BAD_REQUEST", position = 2)
+  private String type;
 
-    @ApiModelProperty(example = "Dados inválidos", position = 4)
-    private String detail;
+  @ApiModelProperty(example = "INVALID_PARAMETER", position = 3)
+  private String errorCode;
 
-    @ApiModelProperty(position = 5)
-    private List<ObjectError> objectErrors;
+  @ApiModelProperty(example = "Dados inválidos", position = 4)
+  private String detail;
+
+  @ApiModelProperty(position = 5)
+  private List<ObjectError> objectErrors;
 }

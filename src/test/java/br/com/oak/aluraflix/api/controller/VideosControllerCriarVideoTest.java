@@ -38,73 +38,60 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource("/application-test.properties")
 public class VideosControllerCriarVideoTest {
 
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private static final String VIDEOS_URL = "/v1/videos";
+  private static final String VIDEOS_URL = "/v1/videos";
 
-    @InjectMocks
-    private VideosController videosController;
+  @InjectMocks private VideosController videosController;
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @MockBean
-    private VideoService videoService;
+  @MockBean private VideoService videoService;
 
-    private Gson gson;
+  private Gson gson;
 
-    private VideoInput videoInput;
+  private VideoInput videoInput;
 
-    @BeforeEach
-    public void beforeEach() {
-        MockitoAnnotations.initMocks(this);
-        gson = getGsonBuilder();
+  @BeforeEach
+  public void beforeEach() {
+    MockitoAnnotations.initMocks(this);
+    gson = getGsonBuilder();
 
-        videoInput =
-                VideoInput.builder()
-                        .titulo("titulo")
-                        .descricao("descricao")
-                        .url("url")
-                        .build();
-    }
+    videoInput = VideoInput.builder().titulo("titulo").descricao("descricao").url("url").build();
+  }
 
-    @Test
-    public void testCriarVideo_cenarioDeSucesso() throws Exception {
-        String request = gson.toJson(videoInput);
+  @Test
+  public void testCriarVideo_cenarioDeSucesso() throws Exception {
+    String request = gson.toJson(videoInput);
 
-        MockHttpServletRequestBuilder builder =
-                MockMvcRequestBuilders.post(VIDEOS_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(request);
+    MockHttpServletRequestBuilder builder =
+        MockMvcRequestBuilders.post(VIDEOS_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(request);
 
-        VideoDto videoDto =
-                VideoDto.builder()
-                        .id(1L)
-                        .titulo("titulo")
-                        .descricao("descricao")
-                        .url("url")
-                        .build();
+    VideoDto videoDto =
+        VideoDto.builder().id(1L).titulo("titulo").descricao("descricao").url("url").build();
 
-        when(videoService.inserir(any())).thenReturn(videoDto);
+    when(videoService.inserir(any())).thenReturn(videoDto);
 
-        mockMvc
-                .perform(builder)
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.response").exists())
-                .andExpect(jsonPath("$.response.id").isNumber())
-                .andExpect(jsonPath("$.response.titulo").value("titulo"))
-                .andExpect(jsonPath("$.response.descricao").value("descricao"))
-                .andExpect(jsonPath("$.response.url").value("url"));
-    }
+    mockMvc
+        .perform(builder)
+        .andDo(print())
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.response").exists())
+        .andExpect(jsonPath("$.response.id").isNumber())
+        .andExpect(jsonPath("$.response.titulo").value("titulo"))
+        .andExpect(jsonPath("$.response.descricao").value("descricao"))
+        .andExpect(jsonPath("$.response.url").value("url"));
+  }
 
-    private Gson getGsonBuilder() {
-        return new GsonBuilder()
-                .registerTypeAdapter(
-                        LocalDate.class,
-                        (JsonSerializer<LocalDate>)
-                                (json, type, JsonSerializationContext) ->
-                                        new JsonPrimitive(DATE_FORMATTER.format(json)))
-                .create();
-    }
+  private Gson getGsonBuilder() {
+    return new GsonBuilder()
+        .registerTypeAdapter(
+            LocalDate.class,
+            (JsonSerializer<LocalDate>)
+                (json, type, JsonSerializationContext) ->
+                    new JsonPrimitive(DATE_FORMATTER.format(json)))
+        .create();
+  }
 }

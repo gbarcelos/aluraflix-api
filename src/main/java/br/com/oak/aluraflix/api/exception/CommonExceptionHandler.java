@@ -36,302 +36,301 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
 
-    public static final String MSG_ERRO_GENERICA_USUARIO_FINAL =
-            "Ocorreu um erro inesperado. Tente novamente e se "
-                    + "o problema persistir, entre em contato com o administrador do sistema.";
+  public static final String MSG_ERRO_GENERICA_USUARIO_FINAL =
+      "Ocorreu um erro inesperado. Tente novamente e se "
+          + "o problema persistir, entre em contato com o administrador do sistema.";
 
-    @Autowired
-    private MessageSource messageSource;
+  @Autowired private MessageSource messageSource;
 
-    @Override
-    protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(
-            HttpMediaTypeNotAcceptableException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request) {
+  @Override
+  protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(
+      HttpMediaTypeNotAcceptableException ex,
+      HttpHeaders headers,
+      HttpStatus status,
+      WebRequest request) {
 
-        return ResponseEntity.status(status).headers(headers).build();
+    return ResponseEntity.status(status).headers(headers).build();
+  }
+
+  @Override
+  protected ResponseEntity<Object> handleBindException(
+      BindException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+
+    return handleValidationInternal(
+        ex, headers, status, request, ex.getBindingResult(), ErrorCode.INVALID_DATA);
+  }
+
+  @Override
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(
+      MethodArgumentNotValidException ex,
+      HttpHeaders headers,
+      HttpStatus status,
+      WebRequest request) {
+
+    ErrorCode errorCode = ErrorCode.INVALID_DATA;
+
+    if (ex.getMessage().contains("NotNull") || ex.getMessage().contains("NotBlank")) {
+      errorCode = ErrorCode.REQUIRED_FIELD;
     }
 
-    @Override
-    protected ResponseEntity<Object> handleBindException(
-            BindException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    return handleValidationInternal(ex, headers, status, request, ex.getBindingResult(), errorCode);
+  }
 
-        return handleValidationInternal(
-                ex, headers, status, request, ex.getBindingResult(), ErrorCode.INVALID_DATA);
+  @Override
+  protected ResponseEntity<Object> handleHttpMessageNotReadable(
+      HttpMessageNotReadableException ex,
+      HttpHeaders headers,
+      HttpStatus status,
+      WebRequest request) {
+
+    Throwable rootCause = ExceptionUtils.getRootCause(ex);
+
+    if (rootCause instanceof InvalidFormatException) {
+      return handleInvalidFormat((InvalidFormatException) rootCause, headers, status, request);
     }
 
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request) {
-
-        ErrorCode errorCode = ErrorCode.INVALID_DATA;
-
-        if (ex.getMessage().contains("NotNull") || ex.getMessage().contains("NotBlank")) {
-            errorCode = ErrorCode.REQUIRED_FIELD;
-        }
-
-        return handleValidationInternal(ex, headers, status, request, ex.getBindingResult(), errorCode);
+    if (rootCause instanceof DateTimeException) {
+      return handleDateTimeException((DateTimeException) rootCause, headers, status, request);
     }
 
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(
-            HttpMessageNotReadableException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request) {
-
-        Throwable rootCause = ExceptionUtils.getRootCause(ex);
-
-        if (rootCause instanceof InvalidFormatException) {
-            return handleInvalidFormat((InvalidFormatException) rootCause, headers, status, request);
-        }
-
-        if (rootCause instanceof DateTimeException) {
-            return handleDateTimeException((DateTimeException) rootCause, headers, status, request);
-        }
-
-        if (rootCause instanceof PropertyBindingException) {
-            return handlePropertyBinding((PropertyBindingException) rootCause, headers, status, request);
-        }
-
-        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
-        ErrorCode errorCode = ErrorCode.INVALID_DATA;
-        String detail = "O corpo da requisição está inválido.";
-
-        ErrorContractResponse errorContractResponse =
-                ErrorContractResponse.builder()
-                        .error(createErrorResponseBuilder(status, errorCode, detail).build())
-                        .path(servletWebRequest.getRequest().getServletPath())
-                        .build();
-
-        return handleExceptionInternal(ex, errorContractResponse, headers, status, request);
+    if (rootCause instanceof PropertyBindingException) {
+      return handlePropertyBinding((PropertyBindingException) rootCause, headers, status, request);
     }
 
-    @Override
-    protected ResponseEntity<Object> handleNoHandlerFoundException(
-            NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+    ErrorCode errorCode = ErrorCode.INVALID_DATA;
+    String detail = "O corpo da requisição está inválido.";
 
-        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
-        String detail =
-                String.format("O recurso %s, que você tentou acessar, é inexistente.", ex.getRequestURL());
+    ErrorContractResponse errorContractResponse =
+        ErrorContractResponse.builder()
+            .error(createErrorResponseBuilder(status, errorCode, detail).build())
+            .path(servletWebRequest.getRequest().getServletPath())
+            .build();
 
-        ErrorContractResponse errorContractResponse =
-                ErrorContractResponse.builder()
-                        .error(createErrorResponseBuilder(status, ErrorCode.RESOURCE_NOT_FOUND, detail).build())
-                        .path(servletWebRequest.getRequest().getServletPath())
-                        .build();
+    return handleExceptionInternal(ex, errorContractResponse, headers, status, request);
+  }
 
-        return handleExceptionInternal(ex, errorContractResponse, headers, status, request);
+  @Override
+  protected ResponseEntity<Object> handleNoHandlerFoundException(
+      NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+
+    ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+    String detail =
+        String.format("O recurso %s, que você tentou acessar, é inexistente.", ex.getRequestURL());
+
+    ErrorContractResponse errorContractResponse =
+        ErrorContractResponse.builder()
+            .error(createErrorResponseBuilder(status, ErrorCode.RESOURCE_NOT_FOUND, detail).build())
+            .path(servletWebRequest.getRequest().getServletPath())
+            .build();
+
+    return handleExceptionInternal(ex, errorContractResponse, headers, status, request);
+  }
+
+  @Override
+  protected ResponseEntity<Object> handleTypeMismatch(
+      TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+
+    if (ex instanceof MethodArgumentTypeMismatchException) {
+      return handleMethodArgumentTypeMismatch(
+          (MethodArgumentTypeMismatchException) ex, headers, status, request);
     }
 
-    @Override
-    protected ResponseEntity<Object> handleTypeMismatch(
-            TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    return super.handleTypeMismatch(ex, headers, status, request);
+  }
 
-        if (ex instanceof MethodArgumentTypeMismatchException) {
-            return handleMethodArgumentTypeMismatch(
-                    (MethodArgumentTypeMismatchException) ex, headers, status, request);
-        }
+  @Override
+  protected ResponseEntity<Object> handleExceptionInternal(
+      Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        return super.handleTypeMismatch(ex, headers, status, request);
+    if (body == null || body instanceof String) {
+      Throwable rootCause = ExceptionUtils.getRootCause(ex);
+      ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+
+      body =
+          ErrorContractResponse.builder()
+              .error(
+                  ErrorResponse.builder()
+                      .status(status.value())
+                      .type(status.name())
+                      .errorCode(status.name())
+                      .detail(rootCause.getMessage())
+                      .build())
+              .path(servletWebRequest.getRequest().getServletPath())
+              .build();
     }
 
-    @Override
-    protected ResponseEntity<Object> handleExceptionInternal(
-            Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    return super.handleExceptionInternal(ex, body, headers, status, request);
+  }
 
-        if (body == null || body instanceof String) {
-            Throwable rootCause = ExceptionUtils.getRootCause(ex);
-            ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+  private ResponseEntity<Object> handleMethodArgumentTypeMismatch(
+      MethodArgumentTypeMismatchException ex,
+      HttpHeaders headers,
+      HttpStatus status,
+      WebRequest request) {
 
-            body =
-                    ErrorContractResponse.builder()
-                            .error(
-                                    ErrorResponse.builder()
-                                            .status(status.value())
-                                            .type(status.name())
-                                            .errorCode(status.name())
-                                            .detail(rootCause.getMessage())
-                                            .build())
-                            .path(servletWebRequest.getRequest().getServletPath())
-                            .build();
-        }
+    ServletWebRequest servletWebRequest = (ServletWebRequest) request;
 
-        return super.handleExceptionInternal(ex, body, headers, status, request);
-    }
+    String detail =
+        String.format(
+            "O parâmetro de URL '%s' recebeu o valor '%s', "
+                + "que é de um tipo inválido. Corrija e informe um valor compatível com o tipo %s.",
+            ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName());
 
-    private ResponseEntity<Object> handleMethodArgumentTypeMismatch(
-            MethodArgumentTypeMismatchException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request) {
+    ErrorContractResponse errorContractResponse =
+        ErrorContractResponse.builder()
+            .error(createErrorResponseBuilder(status, ErrorCode.INVALID_PARAMETER, detail).build())
+            .path(servletWebRequest.getRequest().getServletPath())
+            .build();
 
-        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+    return handleExceptionInternal(ex, errorContractResponse, headers, status, request);
+  }
 
-        String detail =
-                String.format(
-                        "O parâmetro de URL '%s' recebeu o valor '%s', "
-                                + "que é de um tipo inválido. Corrija e informe um valor compatível com o tipo %s.",
-                        ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName());
+  @ExceptionHandler(NotFoundException.class)
+  public ResponseEntity<Object> handleNotFound(NotFoundException ex, WebRequest request) {
 
-        ErrorContractResponse errorContractResponse =
-                ErrorContractResponse.builder()
-                        .error(createErrorResponseBuilder(status, ErrorCode.INVALID_PARAMETER, detail).build())
-                        .path(servletWebRequest.getRequest().getServletPath())
-                        .build();
+    ServletWebRequest servletWebRequest = (ServletWebRequest) request;
 
-        return handleExceptionInternal(ex, errorContractResponse, headers, status, request);
-    }
+    HttpStatus status = HttpStatus.NOT_FOUND;
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Object> handleNotFound(NotFoundException ex, WebRequest request) {
+    ErrorContractResponse errorContractResponse =
+        ErrorContractResponse.builder()
+            .error(
+                createErrorResponseBuilder(status, ex.getErrorCode(), ex.getFriendlyMessage())
+                    .build())
+            .path(servletWebRequest.getRequest().getServletPath())
+            .build();
 
-        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+    return handleExceptionInternal(ex, errorContractResponse, new HttpHeaders(), status, request);
+  }
 
-        HttpStatus status = HttpStatus.NOT_FOUND;
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<Object> handleUncaught(Exception ex, WebRequest request) {
 
-        ErrorContractResponse errorContractResponse =
-                ErrorContractResponse.builder()
-                        .error(
-                                createErrorResponseBuilder(status, ex.getErrorCode(), ex.getFriendlyMessage())
-                                        .build())
-                        .path(servletWebRequest.getRequest().getServletPath())
-                        .build();
+    ServletWebRequest servletWebRequest = (ServletWebRequest) request;
 
-        return handleExceptionInternal(ex, errorContractResponse, new HttpHeaders(), status, request);
-    }
+    HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleUncaught(Exception ex, WebRequest request) {
+    ex.printStackTrace();
 
-        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+    ErrorContractResponse errorContractResponse =
+        ErrorContractResponse.builder()
+            .error(
+                createErrorResponseBuilder(
+                        status, ErrorCode.INTERNAL_SERVER_ERROR, MSG_ERRO_GENERICA_USUARIO_FINAL)
+                    .build())
+            .path(servletWebRequest.getRequest().getServletPath())
+            .build();
 
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+    return handleExceptionInternal(ex, errorContractResponse, new HttpHeaders(), status, request);
+  }
 
-        ex.printStackTrace();
+  private ResponseEntity<Object> handleValidationInternal(
+      Exception ex,
+      HttpHeaders headers,
+      HttpStatus status,
+      WebRequest request,
+      BindingResult bindingResult,
+      ErrorCode errorCode) {
 
-        ErrorContractResponse errorContractResponse =
-                ErrorContractResponse.builder()
-                        .error(
-                                createErrorResponseBuilder(
-                                        status, ErrorCode.INTERNAL_SERVER_ERROR, MSG_ERRO_GENERICA_USUARIO_FINAL)
-                                        .build())
-                        .path(servletWebRequest.getRequest().getServletPath())
-                        .build();
+    String detail = "Um ou mais campos estão inválidos.";
 
-        return handleExceptionInternal(ex, errorContractResponse, new HttpHeaders(), status, request);
-    }
+    List<ObjectError> errors =
+        bindingResult.getAllErrors().stream()
+            .map(
+                objectError -> {
+                  String message =
+                      messageSource.getMessage(objectError, LocaleContextHolder.getLocale());
 
-    private ResponseEntity<Object> handleValidationInternal(
-            Exception ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request,
-            BindingResult bindingResult,
-            ErrorCode errorCode) {
+                  String name = objectError.getObjectName();
 
-        String detail = "Um ou mais campos estão inválidos.";
+                  if (objectError instanceof FieldError) {
+                    name = ((FieldError) objectError).getField();
+                  }
 
-        List<ObjectError> errors =
-                bindingResult.getAllErrors().stream()
-                        .map(
-                                objectError -> {
-                                    String message =
-                                            messageSource.getMessage(objectError, LocaleContextHolder.getLocale());
+                  return ObjectError.builder().name(name).userMessage(message).build();
+                })
+            .collect(Collectors.toList());
 
-                                    String name = objectError.getObjectName();
+    ServletWebRequest servletWebRequest = (ServletWebRequest) request;
 
-                                    if (objectError instanceof FieldError) {
-                                        name = ((FieldError) objectError).getField();
-                                    }
+    ErrorResponse responseError =
+        createErrorResponseBuilder(status, errorCode, detail).objectErrors(errors).build();
 
-                                    return ObjectError.builder().name(name).userMessage(message).build();
-                                })
-                        .collect(Collectors.toList());
+    ErrorContractResponse errorContractResponse =
+        ErrorContractResponse.builder()
+            .error(responseError)
+            .path(servletWebRequest.getRequest().getServletPath())
+            .build();
 
-        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+    return handleExceptionInternal(ex, errorContractResponse, headers, status, request);
+  }
 
-        ErrorResponse responseError =
-                createErrorResponseBuilder(status, errorCode, detail).objectErrors(errors).build();
+  private ResponseEntity<Object> handleInvalidFormat(
+      InvalidFormatException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        ErrorContractResponse errorContractResponse =
-                ErrorContractResponse.builder()
-                        .error(responseError)
-                        .path(servletWebRequest.getRequest().getServletPath())
-                        .build();
+    ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+    String path = joinPath(ex.getPath());
 
-        return handleExceptionInternal(ex, errorContractResponse, headers, status, request);
-    }
+    String detail =
+        String.format(
+            "A propriedade '%s' recebeu o valor '%s', "
+                + "que é de um tipo inválido. Corrija e informe um valor compatível com o tipo %s.",
+            path, ex.getValue(), ex.getTargetType().getSimpleName());
 
-    private ResponseEntity<Object> handleInvalidFormat(
-            InvalidFormatException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    ErrorContractResponse errorContractResponse =
+        ErrorContractResponse.builder()
+            .error(createErrorResponseBuilder(status, ErrorCode.INVALID_FORMAT, detail).build())
+            .path(servletWebRequest.getRequest().getServletPath())
+            .build();
 
-        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
-        String path = joinPath(ex.getPath());
+    return handleExceptionInternal(ex, errorContractResponse, headers, status, request);
+  }
 
-        String detail =
-                String.format(
-                        "A propriedade '%s' recebeu o valor '%s', "
-                                + "que é de um tipo inválido. Corrija e informe um valor compatível com o tipo %s.",
-                        path, ex.getValue(), ex.getTargetType().getSimpleName());
+  private ResponseEntity<Object> handleDateTimeException(
+      DateTimeException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        ErrorContractResponse errorContractResponse =
-                ErrorContractResponse.builder()
-                        .error(createErrorResponseBuilder(status, ErrorCode.INVALID_FORMAT, detail).build())
-                        .path(servletWebRequest.getRequest().getServletPath())
-                        .build();
+    ServletWebRequest servletWebRequest = (ServletWebRequest) request;
 
-        return handleExceptionInternal(ex, errorContractResponse, headers, status, request);
-    }
+    ErrorContractResponse errorContractResponse =
+        ErrorContractResponse.builder()
+            .error(
+                createErrorResponseBuilder(status, ErrorCode.INVALID_FORMAT, ex.getMessage())
+                    .build())
+            .path(servletWebRequest.getRequest().getServletPath())
+            .build();
 
-    private ResponseEntity<Object> handleDateTimeException(
-            DateTimeException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    return handleExceptionInternal(ex, errorContractResponse, headers, status, request);
+  }
 
-        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+  private ResponseEntity<Object> handlePropertyBinding(
+      PropertyBindingException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        ErrorContractResponse errorContractResponse =
-                ErrorContractResponse.builder()
-                        .error(
-                                createErrorResponseBuilder(status, ErrorCode.INVALID_FORMAT, ex.getMessage())
-                                        .build())
-                        .path(servletWebRequest.getRequest().getServletPath())
-                        .build();
+    ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+    String path = joinPath(ex.getPath());
 
-        return handleExceptionInternal(ex, errorContractResponse, headers, status, request);
-    }
+    ErrorCode problemType = ErrorCode.INVALID_DATA;
+    String detail = String.format("A propriedade '%s' não existe.", path);
 
-    private ResponseEntity<Object> handlePropertyBinding(
-            PropertyBindingException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    ErrorContractResponse errorContractResponse =
+        ErrorContractResponse.builder()
+            .error(createErrorResponseBuilder(status, problemType, detail).build())
+            .path(servletWebRequest.getRequest().getServletPath())
+            .build();
 
-        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
-        String path = joinPath(ex.getPath());
+    return handleExceptionInternal(ex, errorContractResponse, headers, status, request);
+  }
 
-        ErrorCode problemType = ErrorCode.INVALID_DATA;
-        String detail = String.format("A propriedade '%s' não existe.", path);
+  private ErrorResponse.ErrorResponseBuilder createErrorResponseBuilder(
+      HttpStatus status, ErrorCode errorCode, String detail) {
+    return ErrorResponse.builder()
+        .status(status.value())
+        .type(status.name())
+        .errorCode(errorCode.name())
+        .detail(detail);
+  }
 
-        ErrorContractResponse errorContractResponse =
-                ErrorContractResponse.builder()
-                        .error(createErrorResponseBuilder(status, problemType, detail).build())
-                        .path(servletWebRequest.getRequest().getServletPath())
-                        .build();
-
-        return handleExceptionInternal(ex, errorContractResponse, headers, status, request);
-    }
-
-    private ErrorResponse.ErrorResponseBuilder createErrorResponseBuilder(
-            HttpStatus status, ErrorCode errorCode, String detail) {
-        return ErrorResponse.builder()
-                .status(status.value())
-                .type(status.name())
-                .errorCode(errorCode.name())
-                .detail(detail);
-    }
-
-    private String joinPath(List<JsonMappingException.Reference> references) {
-        return references.stream().map(ref -> ref.getFieldName()).collect(Collectors.joining("."));
-    }
+  private String joinPath(List<JsonMappingException.Reference> references) {
+    return references.stream().map(ref -> ref.getFieldName()).collect(Collectors.joining("."));
+  }
 }

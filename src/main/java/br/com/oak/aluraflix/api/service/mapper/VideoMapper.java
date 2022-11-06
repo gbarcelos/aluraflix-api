@@ -15,25 +15,25 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class VideoMapper {
 
-    private final ModelMapper modelMapper;
+  private final ModelMapper modelMapper;
 
-    public Video map(VideoInput source) {
-        return modelMapper.map(source, Video.class);
-    }
+  public Video map(VideoInput source) {
+    return modelMapper.map(source, Video.class);
+  }
 
-    public VideoDto unmap(Video source) {
-        return modelMapper.map(source, VideoDto.class);
-    }
+  public VideoDto unmap(Video source) {
+    return modelMapper.map(source, VideoDto.class);
+  }
 
-    public List<VideoDto> unmap(Iterable<Video> videos) {
+  public List<VideoDto> unmap(Iterable<Video> videos) {
 
-        List<VideoDto> list = new ArrayList<>();
+    List<VideoDto> list = new ArrayList<>();
 
-        videos.forEach(
-                lan -> {
-                    list.add(unmap(lan));
-                });
+    videos.forEach(
+        lan -> {
+          list.add(unmap(lan));
+        });
 
-        return list;
-    }
+    return list;
+  }
 }

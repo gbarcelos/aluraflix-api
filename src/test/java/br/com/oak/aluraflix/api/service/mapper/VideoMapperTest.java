@@ -13,26 +13,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 public class VideoMapperTest {
 
-    private VideoMapper videoMapper;
+  private VideoMapper videoMapper;
 
-    @BeforeEach
-    public void beforeEach() {
-        videoMapper = new VideoMapper(new ModelMapper());
-    }
+  @BeforeEach
+  public void beforeEach() {
+    videoMapper = new VideoMapper(new ModelMapper());
+  }
 
-    @Test
-    public void deveMapear_quandoTodosOsCamposObrigatoriosEstaoInformados() {
+  @Test
+  public void deveMapear_quandoTodosOsCamposObrigatoriosEstaoInformados() {
 
-        VideoInput source = VideoInput.builder()
-                .titulo("titulo")
-                .descricao("descricao")
-                .url("url")
-                .build();
+    VideoInput source =
+        VideoInput.builder().titulo("titulo").descricao("descricao").url("url").build();
 
-        Video result = videoMapper.map(source);
+    Video result = videoMapper.map(source);
 
-        assertEquals(source.getTitulo(), result.getTitulo());
-        assertEquals(source.getDescricao(), result.getDescricao());
-        assertEquals(source.getUrl(), result.getUrl());
-    }
+    assertEquals(source.getTitulo(), result.getTitulo());
+    assertEquals(source.getDescricao(), result.getDescricao());
+    assertEquals(source.getUrl(), result.getUrl());
+  }
 }

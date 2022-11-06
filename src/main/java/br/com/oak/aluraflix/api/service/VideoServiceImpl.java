@@ -18,53 +18,55 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class VideoServiceImpl implements VideoService {
 
-    private final VideoRepository videoRepository;
-    private final VideoMapper videoMapper;
-    private final ModelMapper modelMapper;
+  private final VideoRepository videoRepository;
+  private final VideoMapper videoMapper;
+  private final ModelMapper modelMapper;
 
-    @Override
-    public List<VideoDto> listarDespesasDoUsuario(String descricao) {
-        return videoMapper.unmap(videoRepository.findAll());
-    }
+  @Override
+  public List<VideoDto> listarDespesasDoUsuario(String descricao) {
+    return videoMapper.unmap(videoRepository.findAll());
+  }
 
-    @Override
-    public VideoDto detalhar(Long id) {
+  @Override
+  public VideoDto detalhar(Long id) {
 
-        Video video = buscarVideoPorId(id);
+    Video video = buscarVideoPorId(id);
 
-        return videoMapper.unmap(video);
-    }
+    return videoMapper.unmap(video);
+  }
 
-    @Override
-    public VideoDto inserir(VideoInput videoInput) {
+  @Override
+  public VideoDto inserir(VideoInput videoInput) {
 
-        Video video = videoMapper.map(videoInput);
+    Video video = videoMapper.map(videoInput);
 
-        videoRepository.save(video);
+    videoRepository.save(video);
 
-        return videoMapper.unmap(video);
-    }
+    return videoMapper.unmap(video);
+  }
 
-    @Override
-    public void atualizar(Long id, VideoInput videoInput) {
-        Video videoBanco = buscarVideoPorId(id);
-        Video video = videoMapper.map(videoInput);
+  @Override
+  public void atualizar(Long id, VideoInput videoInput) {
+    Video videoBanco = buscarVideoPorId(id);
+    Video video = videoMapper.map(videoInput);
 
-        modelMapper.map(video, videoBanco);
+    modelMapper.map(video, videoBanco);
 
-        videoRepository.save(videoBanco);
-    }
+    videoRepository.save(videoBanco);
+  }
 
-    @Override
-    public void excluir(Long id) {
-        videoRepository.delete(buscarVideoPorId(id));
-    }
+  @Override
+  public void excluir(Long id) {
+    videoRepository.delete(buscarVideoPorId(id));
+  }
 
-    private Video buscarVideoPorId(Long id) {
-        return videoRepository.findById(id).orElseThrow(
-                () ->
-                        new NotFoundException(
-                                ErrorCode.RESOURCE_NOT_FOUND,
-                                String.format("O registro com o id '%s' não existe", id)));
-    }
+  private Video buscarVideoPorId(Long id) {
+    return videoRepository
+        .findById(id)
+        .orElseThrow(
+            () ->
+                new NotFoundException(
+                    ErrorCode.RESOURCE_NOT_FOUND,
+                    String.format("O registro com o id '%s' não existe", id)));
+  }
 }

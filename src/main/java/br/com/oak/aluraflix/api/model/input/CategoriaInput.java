@@ -11,17 +11,13 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class VideoInput {
+public class CategoriaInput {
 
-  @ApiModelProperty(example = "Título do vídeo", position = 1)
+  @ApiModelProperty(example = "Título da categoria", position = 1)
   @NotBlank
   private String titulo;
 
-  @ApiModelProperty(example = "Descrição do video", position = 2)
+  @ApiModelProperty(example = "#3c3c3c", position = 2)
   @NotBlank
-  private String descricao;
-
-  @ApiModelProperty(example = "Url do video", position = 3)
-  @NotBlank
-  private String url;
+  private String cor;
 }

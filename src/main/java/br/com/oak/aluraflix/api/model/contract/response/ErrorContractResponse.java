@@ -9,13 +9,13 @@ import lombok.*;
 @Builder
 public class ErrorContractResponse {
 
-    private ErrorResponse error;
+  private ErrorResponse error;
 
-    @ApiModelProperty(
-            value = "String",
-            example = "Tue Jan 12 16:36:32 EST 2021",
-            notes = "Request Timestamp in format EEE MMM dd HH:mm:ss z yyyy")
-    private String timestamp;
+  @ApiModelProperty(
+      value = "String",
+      example = "Tue Jan 12 16:36:32 EST 2021",
+      notes = "Request Timestamp in format EEE MMM dd HH:mm:ss z yyyy")
+  private String timestamp;
 
-    private String path;
+  private String path;
 }

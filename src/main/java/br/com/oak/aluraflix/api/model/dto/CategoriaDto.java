@@ -8,17 +8,14 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-public class VideoDto {
+public class CategoriaDto {
 
   @ApiModelProperty(example = "452163", position = 1)
   private Long id;
 
-  @ApiModelProperty(example = "Título do vídeo", position = 2)
+  @ApiModelProperty(example = "Título da categoria", position = 2)
   private String titulo;
 
-  @ApiModelProperty(example = "Descrição do video", position = 3)
-  private String descricao;
-
-  @ApiModelProperty(example = "Url do video", position = 4)
-  private String url;
+  @ApiModelProperty(example = "#3c3c3c", position = 3)
+  private String cor;
 }

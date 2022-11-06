@@ -4,7 +4,7 @@ import br.com.oak.aluraflix.api.model.ErrorCode;
 
 public class NotFoundException extends AbstractException {
 
-    public NotFoundException(ErrorCode errorCode, String friendlyMessage) {
-        super(errorCode, friendlyMessage);
-    }
+  public NotFoundException(ErrorCode errorCode, String friendlyMessage) {
+    super(errorCode, friendlyMessage);
+  }
 }
