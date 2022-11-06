@@ -2,10 +2,7 @@ package br.com.oak.aluraflix.api.entity;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -25,4 +22,8 @@ public class Video {
   private String descricao;
 
   private String url;
+
+  @ManyToOne
+  @JoinColumn(name = "categoria_id")
+  private Categoria categoria;
 }

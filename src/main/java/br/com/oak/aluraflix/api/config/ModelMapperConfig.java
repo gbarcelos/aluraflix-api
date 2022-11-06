@@ -2,6 +2,7 @@ package br.com.oak.aluraflix.api.config;
 
 import br.com.oak.aluraflix.api.entity.Categoria;
 import br.com.oak.aluraflix.api.entity.Video;
+import br.com.oak.aluraflix.api.model.dto.VideoDto;
 import br.com.oak.aluraflix.api.model.input.CategoriaInput;
 import br.com.oak.aluraflix.api.model.input.VideoInput;
 import org.modelmapper.ModelMapper;
@@ -36,6 +37,11 @@ public class ModelMapperConfig {
     modelMapper
         .createTypeMap(CategoriaInput.class, Categoria.class)
         .addMappings(mapper -> mapper.skip(Categoria::setId));
+
+    modelMapper
+        .createTypeMap(Video.class, VideoDto.class)
+        .addMappings(
+            mapper -> mapper.map(src -> src.getCategoria().getTitulo(), VideoDto::setCategoria));
 
     return modelMapper;
   }

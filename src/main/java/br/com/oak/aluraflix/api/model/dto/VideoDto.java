@@ -21,4 +21,7 @@ public class VideoDto {
 
   @ApiModelProperty(example = "Url do video", position = 4)
   private String url;
+
+  @ApiModelProperty(example = "Livre", position = 5)
+  private String categoria;
 }
