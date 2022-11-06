@@ -29,7 +29,7 @@ public class VideosController implements VideosControllerOpenApi {
       @RequestParam(required = false) String descricao, HttpServletRequest request) {
     return ContractResponse.<List<VideoDto>>builder()
         .path(request.getServletPath())
-        .response(videoService.listarDespesasDoUsuario(descricao))
+        .response(videoService.listarVideosDoUsuario(descricao))
         .build();
   }
 

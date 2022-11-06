@@ -16,7 +16,7 @@ public interface VideosControllerOpenApi {
       tags = {"Consultas"})
   @ApiResponses({@ApiResponse(code = 200, message = "Videos listados com sucesso")})
   ContractResponse<List<VideoDto>> listarVideos(
-      @ApiParam(name = "descricao", type = "String", value = "Descrição de uma despesa")
+      @ApiParam(name = "descricao", type = "String", value = "Descrição de um video")
           String descricao,
       HttpServletRequest request);
 

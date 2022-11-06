@@ -23,7 +23,7 @@ public class VideoServiceImpl implements VideoService {
   private final ModelMapper modelMapper;
 
   @Override
-  public List<VideoDto> listarDespesasDoUsuario(String descricao) {
+  public List<VideoDto> listarVideosDoUsuario(String descricao) {
     return videoMapper.unmap(videoRepository.findAll());
   }
 
