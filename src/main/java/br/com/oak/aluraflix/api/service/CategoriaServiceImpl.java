@@ -8,6 +8,7 @@ import br.com.oak.aluraflix.api.model.input.CategoriaInput;
 import br.com.oak.aluraflix.api.repository.CategoriaRepository;
 import br.com.oak.aluraflix.api.service.mapper.CategoriaMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,11 @@ public class CategoriaServiceImpl implements CategoriaService {
 
   @Override
   public List<CategoriaDto> listarCategorias(String titulo) {
+
+    if (StringUtils.isNotBlank(titulo)) {
+      return categoriaMapper.unmap(
+          categoriaRepository.findAllByTituloLike("%".concat(titulo).concat("%")));
+    }
     return categoriaMapper.unmap(categoriaRepository.findAll());
   }
 
