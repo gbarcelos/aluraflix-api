@@ -24,4 +24,7 @@ public class VideoInput {
   @ApiModelProperty(example = "Url do video", position = 3)
   @NotBlank
   private String url;
+
+  @ApiModelProperty(example = "1", position = 4)
+  private Long categoriaId;
 }
