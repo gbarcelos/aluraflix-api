@@ -34,7 +34,6 @@ Projeto de uma API para salvar links para seus vídeos preferidos, separados por
 - ``Boas práticas e modelagem avançada de APIs``
 	- ``DTOs como alternativa ao uso de entidades como modelo de representação dos recursos``
 	- ``ModelMapper para fazer Object Mapping e converter DTOs em entidades e vice-versa``
-	- ``UUID para identificar recursos sensíveis``
 - ``Testes``
 	- ``Testes de unidade``
 	- ``Testes de integração``
