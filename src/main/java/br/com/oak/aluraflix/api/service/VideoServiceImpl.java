@@ -8,6 +8,7 @@ import br.com.oak.aluraflix.api.model.input.VideoInput;
 import br.com.oak.aluraflix.api.repository.VideoRepository;
 import br.com.oak.aluraflix.api.service.mapper.VideoMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,53 +19,64 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class VideoServiceImpl implements VideoService {
 
-    private final VideoRepository videoRepository;
-    private final VideoMapper videoMapper;
-    private final ModelMapper modelMapper;
+  private final VideoRepository videoRepository;
+  private final VideoMapper videoMapper;
+  private final ModelMapper modelMapper;
 
-    @Override
-    public List<VideoDto> listarDespesasDoUsuario(String descricao) {
-        return videoMapper.unmap(videoRepository.findAll());
+  @Override
+  public List<VideoDto> listarVideos(String titulo) {
+
+    if (StringUtils.isNotBlank(titulo)) {
+      return videoMapper.unmap(videoRepository.findByTitulo(titulo));
     }
+    return videoMapper.unmap(videoRepository.findAll());
+  }
 
-    @Override
-    public VideoDto detalhar(Long id) {
+  @Override
+  public List<VideoDto> listarVideosPorCategoria(Long categoriaId) {
+    return videoMapper.unmap(videoRepository.findByCategoriaId(categoriaId));
+  }
 
-        Video video = buscarVideoPorId(id);
+  @Override
+  public VideoDto detalhar(Long id) {
 
-        return videoMapper.unmap(video);
-    }
+    Video video = buscarVideoPorId(id);
 
-    @Override
-    public VideoDto inserir(VideoInput videoInput) {
+    return videoMapper.unmap(video);
+  }
 
-        Video video = videoMapper.map(videoInput);
+  @Override
+  public VideoDto inserir(VideoInput videoInput) {
 
-        videoRepository.save(video);
+    Video video = videoMapper.map(videoInput);
 
-        return videoMapper.unmap(video);
-    }
+    videoRepository.save(video);
 
-    @Override
-    public void atualizar(Long id, VideoInput videoInput) {
-        Video videoBanco = buscarVideoPorId(id);
-        Video video = videoMapper.map(videoInput);
+    return videoMapper.unmap(video);
+  }
 
-        modelMapper.map(video, videoBanco);
+  @Override
+  public void atualizar(Long id, VideoInput videoInput) {
+    Video videoBanco = buscarVideoPorId(id);
+    Video video = videoMapper.map(videoInput);
 
-        videoRepository.save(videoBanco);
-    }
+    modelMapper.map(video, videoBanco);
 
-    @Override
-    public void excluir(Long id) {
-        videoRepository.delete(buscarVideoPorId(id));
-    }
+    videoRepository.save(videoBanco);
+  }
 
-    private Video buscarVideoPorId(Long id) {
-        return videoRepository.findById(id).orElseThrow(
-                () ->
-                        new NotFoundException(
-                                ErrorCode.RESOURCE_NOT_FOUND,
-                                String.format("O registro com o id '%s' não existe", id)));
-    }
+  @Override
+  public void excluir(Long id) {
+    videoRepository.delete(buscarVideoPorId(id));
+  }
+
+  private Video buscarVideoPorId(Long id) {
+    return videoRepository
+        .findById(id)
+        .orElseThrow(
+            () ->
+                new NotFoundException(
+                    ErrorCode.RESOURCE_NOT_FOUND,
+                    String.format("O registro com o id '%s' não existe", id)));
+  }
 }

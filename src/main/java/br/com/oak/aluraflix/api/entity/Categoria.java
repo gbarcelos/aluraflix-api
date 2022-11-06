@@ -2,7 +2,10 @@ package br.com.oak.aluraflix.api.entity;
 
 import lombok.*;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Getter
 @Setter
@@ -10,7 +13,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Video {
+public class Categoria {
 
   @Id
   @EqualsAndHashCode.Include
@@ -19,11 +22,5 @@ public class Video {
 
   private String titulo;
 
-  private String descricao;
-
-  private String url;
-
-  @ManyToOne
-  @JoinColumn(name = "categoria_id", nullable = false)
-  private Categoria categoria;
+  private String cor;
 }

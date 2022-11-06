@@ -4,6 +4,7 @@ import br.com.oak.aluraflix.api.entity.Video;
 import br.com.oak.aluraflix.api.exception.NotFoundException;
 import br.com.oak.aluraflix.api.model.ErrorCode;
 import br.com.oak.aluraflix.api.model.input.VideoInput;
+import br.com.oak.aluraflix.api.repository.CategoriaRepository;
 import br.com.oak.aluraflix.api.repository.VideoRepository;
 import br.com.oak.aluraflix.api.service.mapper.VideoMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,86 +24,80 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class VideoServiceAtualizarTest {
 
-    public static final Long VIDEO_ID = 1L;
+  public static final Long VIDEO_ID = 1L;
 
-    @Mock
-    private VideoRepository videoRepository;
+  @Mock private VideoRepository videoRepository;
+  @Mock private CategoriaRepository categoriaRepository;
 
-    @Captor
-    private ArgumentCaptor<Video> captor;
+  @Captor private ArgumentCaptor<Video> captor;
 
-    private VideoMapper videoMapper;
+  private VideoMapper videoMapper;
 
-    private ModelMapper modelMapper;
+  private ModelMapper modelMapper;
 
-    private VideoService videoService;
+  private VideoService videoService;
 
-    @BeforeEach
-    public void beforeEach() {
-        modelMapper = new ModelMapper();
-        modelMapper
-                .createTypeMap(Video.class, Video.class)
-                .addMappings(
-                        mapper -> {
-                            mapper.skip(Video::setId);
-                        });
-        videoMapper = new VideoMapper(modelMapper);
-        videoService = new VideoServiceImpl(videoRepository, videoMapper, modelMapper);
-    }
+  @BeforeEach
+  public void beforeEach() {
+    modelMapper = new ModelMapper();
+    modelMapper
+        .createTypeMap(Video.class, Video.class)
+        .addMappings(
+            mapper -> {
+              mapper.skip(Video::setId);
+            });
+    videoMapper = new VideoMapper(modelMapper, categoriaRepository);
+    videoService = new VideoServiceImpl(videoRepository, videoMapper, modelMapper);
+  }
 
-    @Test
-    public void testAtualizar_cenarioDeSucesso() {
-        // Arrange
-        VideoInput videoAlterado = VideoInput.builder()
-                .titulo("titulo, alterado")
-                .descricao("descricao, alterado")
-                .url("url, alterado")
-                .build();
+  @Test
+  public void testAtualizar_cenarioDeSucesso() {
+    // Arrange
+    VideoInput videoAlterado =
+        VideoInput.builder()
+            .titulo("titulo, alterado")
+            .descricao("descricao, alterado")
+            .url("url, alterado")
+            .build();
 
-        Video videoBanco = Video.builder()
-                .id(VIDEO_ID)
-                .titulo("titulo")
-                .descricao("descricao")
-                .url("url")
-                .build();
+    Video videoBanco =
+        Video.builder().id(VIDEO_ID).titulo("titulo").descricao("descricao").url("url").build();
 
-        when(videoRepository.findById(VIDEO_ID))
-                .thenReturn(Optional.of(videoBanco));
+    when(videoRepository.findById(VIDEO_ID)).thenReturn(Optional.of(videoBanco));
 
-        // Act
-        videoService.atualizar(VIDEO_ID, videoAlterado);
+    // Act
+    videoService.atualizar(VIDEO_ID, videoAlterado);
 
-        // Assert
-        verify(videoRepository, times(1)).save(captor.capture());
+    // Assert
+    verify(videoRepository, times(1)).save(captor.capture());
 
-        assertNotNull(captor.getValue().getId());
-        assertEquals("titulo, alterado", captor.getValue().getTitulo());
-        assertEquals("descricao, alterado", captor.getValue().getDescricao());
-        assertEquals("url, alterado", captor.getValue().getUrl());
-    }
+    assertNotNull(captor.getValue().getId());
+    assertEquals("titulo, alterado", captor.getValue().getTitulo());
+    assertEquals("descricao, alterado", captor.getValue().getDescricao());
+    assertEquals("url, alterado", captor.getValue().getUrl());
+  }
 
-    @Test
-    public void testAtualizar_quandoVideoNaoFoiEncontrado_entaoLancaNotFoundException() {
-        // Arrange
-        when(videoRepository.findById(VIDEO_ID))
-                .thenReturn(Optional.empty());
+  @Test
+  public void testAtualizar_quandoVideoNaoFoiEncontrado_entaoLancaNotFoundException() {
+    // Arrange
+    when(videoRepository.findById(VIDEO_ID)).thenReturn(Optional.empty());
 
-        VideoInput videoAlterado = VideoInput.builder()
-                .titulo("titulo, alterado")
-                .descricao("descricao, alterado")
-                .url("url, alterado")
-                .build();
+    VideoInput videoAlterado =
+        VideoInput.builder()
+            .titulo("titulo, alterado")
+            .descricao("descricao, alterado")
+            .url("url, alterado")
+            .build();
 
-        // Act
-        NotFoundException notFoundException =
-                assertThrows(
-                        NotFoundException.class,
-                        () -> videoService.atualizar(VIDEO_ID, videoAlterado));
+    // Act
+    NotFoundException notFoundException =
+        assertThrows(
+            NotFoundException.class, () -> videoService.atualizar(VIDEO_ID, videoAlterado));
 
-        // Assert
-        assertEquals(ErrorCode.RESOURCE_NOT_FOUND, notFoundException.getErrorCode());
-        assertEquals(
-                String.format("O registro com o id '%s' não existe", VIDEO_ID),
-                notFoundException.getFriendlyMessage());
-    }
+    // Assert
+    assertEquals(ErrorCode.RESOURCE_NOT_FOUND, notFoundException.getErrorCode());
+    assertEquals(
+        String.format("O registro com o id '%s' não existe", VIDEO_ID),
+        notFoundException.getFriendlyMessage());
+  }
 }
