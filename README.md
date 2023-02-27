@@ -9,6 +9,8 @@ Projeto de uma API para salvar links para seus vídeos preferidos, separados por
 | :rocket: URL         | TBD
 | :fire: Desafio     | https://www.alura.com.br/challenges/back-end-5
 
+![Programação-aluraflix-api](https://user-images.githubusercontent.com/13111308/221464125-472d2116-94c8-4a6a-9e4d-5a9494150846.png?text=capa+do+meu+projeto#vitrinedev)
+
 ## ✔️ Tecnologias utilizadas
 
 <img alt="Java" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original-wordmark.svg" width="50" height="50"/> <img alt="IntelliJ" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/intellij/intellij-original.svg" width="50" height="50"/> <img alt="Spring" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original-wordmark.svg" width="50" height="50"/> <img alt="MySQL" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original-wordmark.svg"  width="50" height="50"/> 
